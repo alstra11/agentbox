@@ -138,8 +138,8 @@ describe('the shell is asked before any list', () => {
 });
 
 describe('one registry, one strategy', () => {
-  it('holds both engines the app ships with, and nothing else', () => {
-    expect(engineKeys()).toEqual(['claude', 'codex']);
+  it('holds every engine in the registry, including optional harnesses', () => {
+    expect(engineKeys()).toEqual(['claude', 'codex', 'cursor']);
   });
 
   // THE POINT OF THE REGISTRY. A third harness is an entry: a bin name, where
@@ -162,7 +162,7 @@ describe('one registry, one strategy', () => {
     expect(dirs.length).toBeGreaterThanOrEqual(14);
     for (const key of engineKeys()) {
       const paths = ENGINES[key].candidates(HOME, () => []);
-      for (const dir of dirs) expect(paths).toContain(path.join(dir, key));
+      for (const dir of dirs) expect(paths).toContain(path.join(dir, ENGINES[key].bin));
     }
   });
 
@@ -172,7 +172,7 @@ describe('one registry, one strategy', () => {
   it('never offers one engine a path belonging to the other', () => {
     for (const key of engineKeys()) {
       for (const p of ENGINES[key].candidates(HOME, () => ['v22.14.0'])) {
-        expect(path.basename(p)).toBe(key);
+        expect(path.basename(p)).toBe(ENGINES[key].bin);
       }
     }
   });

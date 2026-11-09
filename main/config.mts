@@ -12,6 +12,7 @@ import crypto from 'node:crypto';
 import { resolveClaudeBin, candidatePaths } from './claude-bin.mts';
 import { warmShellAnswers, type EngineFrom } from './engine-bin.mts';
 import { resolveCodexBin } from './codex-bin.mts';
+import { resolveCursorBin } from './cursor-bin.mts';
 import { defaultStoreRoot } from './store/home.mts';
 import { machineSlots } from './machine.mts';
 import { runningAsAFreshUser } from '../shared/fresh-user-home.mts';
@@ -73,6 +74,11 @@ export interface Config extends ConfigDefaults {
   codexFound: boolean;
   codexCertain: boolean;
   codexFrom: EngineFrom | null;
+  cursorBinConfigured?: string | null;
+  cursorBin?: string | null;
+  cursorFound?: boolean;
+  cursorCertain?: boolean;
+  cursorFrom?: EngineFrom | null;
   machineSlots: number;
   authProfiles?: string[] | null;
   home: string;
@@ -304,6 +310,14 @@ export function loadConfig(appDir: string, { home = os.homedir() }: { home?: str
   config.codexFound = codex.found;
   config.codexCertain = codex.certain !== false;
   config.codexFrom = codex.from;
+  config.cursorBinConfigured = typeof overrides.cursorBin === 'string' && overrides.cursorBin
+    ? overrides.cursorBin
+    : null;
+  const cursor = resolveCursorBin(config.cursorBinConfigured);
+  config.cursorBin = cursor.found ? cursor.path : null;
+  config.cursorFound = cursor.found;
+  config.cursorCertain = cursor.certain !== false;
+  config.cursorFrom = cursor.from;
   // AND AN OLDER INSTALL WITH CODEX ON IT OPENS THE CHOICE TOO (w-d5d632e503).
   // Only a Mac with no config file did, so a person who installed before
   // that, or who added Codex later, never saw Codex anywhere. Written at the

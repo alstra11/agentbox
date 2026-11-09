@@ -376,14 +376,20 @@ export function registerIpc<W extends IpcWindow>({ store, supervisor, config, wi
       allow = false;
       note = CARD_CHANGED;
     }
+    if (allow && supervisor.cursorCardChanged?.(id, shown)) {
+      console.warn(`zero: approval ${id} was drawn from a request that has since been rewritten; the founder's choice was for a different card and nothing has been allowed`);
+      allow = false;
+      note = CARD_CHANGED;
+    }
     const ok = approvals.answer(config.storeRoot, id, allow, note);
     if (!ok) { allow = false; note = SPOOL_REFUSED; }
     const settled = supervisor.settleCodexApproval?.(id, allow, note) ?? false;
+    const cursorSettled = supervisor.settleCursorApproval?.(id, allow, note) ?? false;
     if (!ok && settled) console.warn(`zero: approval ${id} could not be recorded in the spool; the worker waiting on it has been denied`);
-    if ((ok || settled) && !window.isDestroyed()) {
+    if ((ok || settled || cursorSettled) && !window.isDestroyed()) {
       window.webContents.send('zero:approval-answered', { id, allow: !!allow });
     }
-    return ok || settled;
+    return ok || settled || cursorSettled;
   };
 
   // THE RENDERER'S ONLY WAY TO COUNT ANYTHING, and it cannot send: it hands a

@@ -3,6 +3,7 @@
 import { claudeHarness } from './harnesses/claude.mts';
 import { codexHarness } from './harnesses/codex.mts';
 import { openCodeHarness } from './harnesses/opencode.mts';
+import { cursorHarness } from './harnesses/cursor.mts';
 import type { Harness, HarnessCapabilities } from './harnesses/common.mts';
 
 type HarnessFunction = (...args: unknown[]) => unknown;
@@ -71,7 +72,7 @@ export function createHarnessRegistry(adapters: HarnessAdapter[]) {
 // name gets the real adapter, and it is deliberately absent from `ENGINES`
 // (shared/engines.mts) so no row can choose it and no picker draws it until
 // that is turned on deliberately. The two decisions are separate on purpose.
-const registry = createHarnessRegistry([claudeHarness, codexHarness, openCodeHarness]);
+const registry = createHarnessRegistry([claudeHarness, codexHarness, openCodeHarness, cursorHarness]);
 export const harnessFor = (id?: string): Harness => registry.get(id);
 export const supportsHarnessOperation = (id: string, name: string) => registry.supports(id, name);
 

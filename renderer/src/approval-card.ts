@@ -87,6 +87,18 @@ export function approvalReads(input: unknown, tool?: string): ApprovalReading {
     }
     return { what: 'asks to use', body: `${identity}\n\n${argumentsText}` };
   }
+  if (tool === 'cursor/ask_question') {
+    const questions = (input && typeof input === 'object' && !Array.isArray(input))
+      ? (input as { questions?: unknown[] }).questions : [];
+    const lines: string[] = [];
+    if ((input as { title?: string })?.title) lines.push(String((input as { title: string }).title));
+    for (const q of Array.isArray(questions) ? questions : []) {
+      const row = q as { prompt?: string; options?: { label?: string; id?: string }[] };
+      if (row?.prompt) lines.push(String(row.prompt));
+      for (const opt of row?.options ?? []) lines.push(`  • ${opt.label ?? opt.id}`);
+    }
+    return { what: 'asks you to choose', body: lines.join('\n') || UNREADABLE };
+  }
   const it = (input ?? {}) as Record<string, unknown>;
   if (typeof it.changes === 'string' && it.changes) return { what: 'asks to change', body: it.changes };
   if (typeof it.command === 'string') return { what: 'asks to run', body: it.command };

@@ -1082,10 +1082,10 @@ export default function App() {
     if (fresh) void answerCard(id, allow);
   };
   // An answer that did not go (the phone's database, a card that moved) puts the card back and says why.
-  const answerCard = async (id: string, allow: boolean) => {
+  const answerCard = async (id: string, allow: boolean, note?: string) => {
     setAnswered({ id, allow });
     setAnswerGoing(true);
-    const r = await pressWithin(() => window.zero?.approve?.({ id, allow }));
+    const r = await pressWithin(() => window.zero?.approve?.({ id, allow, note }));
     if (r && (r as { ok?: boolean }).ok === false) {
       setAnswered(null);
       showToast(`Not answered: ${(r as { error?: string }).error ?? 'it did not go through'}`);
@@ -9266,7 +9266,9 @@ export default function App() {
                 {(() => {
                   const row = approvalRow(a.item);
                   const mcp = a.tool.startsWith('mcp__');
-                  const agent = row ? (harnessOf(row) === 'codex' ? 'Codex' : 'Claude Code') : null;
+                  const agent = row
+                    ? (row.engine === 'cursor' ? 'Cursor' : harnessOf(row) === 'codex' ? 'Codex' : 'Claude Code')
+                    : null;
                   const asker = approvalAsker(row ? rowTitle(row) : null, snap.products.find((p) => p.slug === a.product)?.name ?? a.product ?? 'An agent');
                   const input = a.input as ApprovalInput | undefined;
                   const cwd = !mcp && input?.cwd ? String(input.cwd) : null;
@@ -9312,11 +9314,22 @@ export default function App() {
                   );
                 })()}
                 <div className="approval-actions">
-                  {/* The acknowledgement starts on the press, not on the round
-                      trip: main answers the file and echoes the same verdict
-                      back, so the click and the chord land on one behaviour. */}
-                  <button className="approval-allow" onPointerDown={() => { approvalPress.current = `${a.id}:true`; }} onPointerCancel={() => { approvalPress.current = null; }} onClick={(e) => clickCard(a.id, true, e.detail)}>Allow<span className="approval-key">{chord('⌘1')}</span></button>
-                  <button className="approval-deny" onPointerDown={() => { approvalPress.current = `${a.id}:false`; }} onPointerCancel={() => { approvalPress.current = null; }} onClick={(e) => clickCard(a.id, false, e.detail)}>Deny<span className="approval-key">{chord('⌘2')}</span></button>
+                  {a.tool === 'cursor/ask_question' && Array.isArray((a.input as { questions?: { id: string; options: { id: string; label: string }[] }[] })?.questions?.[0]?.options)
+                    ? (a.input as { questions: { id: string; options: { id: string; label: string }[] }[] }).questions[0].options.map((opt) => (
+                      <button key={opt.id} className="approval-allow" type="button" onClick={(e) => {
+                        const questionId = (a.input as { questions: { id: string }[] }).questions[0].id;
+                        const note = JSON.stringify({ answers: [{ questionId, selectedOptionIds: [opt.id] }] });
+                        if (approvalClickAllowed(onPhone(), e.detail, null, `${a.id}:true`)) {
+                          void answerCard(a.id, true, note);
+                        }
+                      }}>{opt.label}</button>
+                    ))
+                    : (
+                      <>
+                        <button className="approval-allow" onPointerDown={() => { approvalPress.current = `${a.id}:true`; }} onPointerCancel={() => { approvalPress.current = null; }} onClick={(e) => clickCard(a.id, true, e.detail)}>Allow<span className="approval-key">{chord('⌘1')}</span></button>
+                        <button className="approval-deny" onPointerDown={() => { approvalPress.current = `${a.id}:false`; }} onPointerCancel={() => { approvalPress.current = null; }} onClick={(e) => clickCard(a.id, false, e.detail)}>Deny<span className="approval-key">{chord('⌘2')}</span></button>
+                      </>
+                    )}
                 </div>
               </div>
             </div>

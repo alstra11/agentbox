@@ -8,7 +8,7 @@ import type { CodexFrame } from '../codex.mts';
 
 export type Env = NodeJS.ProcessEnv;
 
-export type BinKey = 'claudeBin' | 'codexBin' | 'opencodeBin';
+export type BinKey = 'claudeBin' | 'codexBin' | 'opencodeBin' | 'cursorBin';
 
 export interface HarnessConfig extends Partial<Record<BinKey, string | null>> {
   home?: string;
@@ -156,6 +156,9 @@ export interface HarnessSupervisor {
   _releaseIdleCodex(profile: string): unknown;
   _openCodePassword?(): string | null;
   _openCodeApprovals?(item: HarnessItem): ((type: string, properties: OpenCodeProperties) => unknown) | null;
+  _spawnCursorWorker(plan: HarnessPlan, context: HarnessSpawnContext): unknown;
+  settleCursorApproval(id: string, allow: boolean, note?: string | null): boolean;
+  cursorCardChanged(id: string, shown: unknown): boolean;
 }
 
 export interface CodexClient {

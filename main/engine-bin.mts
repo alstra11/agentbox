@@ -335,6 +335,21 @@ export const ENGINES = {
       ]),
     },
   }),
+
+  cursor: engine({
+    bin: 'agent',
+    name: 'Cursor',
+    installUrl: 'https://cursor.com/docs/cli/installation',
+    ownPaths: (home) => [
+      path.join(home, '.local/bin/agent'),
+      '/usr/local/bin/agent',
+      '/opt/homebrew/bin/agent',
+    ],
+    evidence: (home) => [
+      path.join(home, '.cursor'),
+      path.join(home, '.cursor/cli-config.json'),
+    ],
+  }),
 };
 
 export type EngineKey = keyof typeof ENGINES;

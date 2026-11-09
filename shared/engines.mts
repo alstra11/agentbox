@@ -46,8 +46,13 @@ export interface EngineWorkspace {
 /** Which engine binaries the finders found, by engine id. */
 export type EnginesFound = Record<string, boolean | undefined>;
 
+/** Whether the experimental Cursor harness is offered in the picker (`zero.config.json`). */
+export function cursorHarnessEnabled(config: EngineWorkspace | null = {}): boolean {
+  return (config as { cursorHarness?: unknown } | null)?.cursorHarness === true;
+}
+
 export const ENGINES: Engine[] = HARNESS_DEFINITIONS
-  .filter(({ admitted }) => admitted !== false)
+  .filter(({ admitted, id }) => admitted !== false && id !== 'cursor')
   .map(({ id, label, word }) => ({ id, label, word }));
 
 export const ENGINE_IDS: string[] = ENGINES.map((e) => e.id);
@@ -143,11 +148,16 @@ export function engineChoiceOnRowIsStale(item: EngineRow | null | undefined, con
   return !(Number.isFinite(ts) && ts! >= since);
 }
 
-export function isEngine(id: unknown): id is string {
-  return typeof id === 'string' && ENGINE_IDS.includes(id);
+export function isEngine(id: unknown, config: EngineWorkspace | null = {}): id is string {
+  if (typeof id !== 'string') return false;
+  if (id === 'cursor') return cursorHarnessEnabled(config);
+  return ENGINE_IDS.includes(id);
 }
 
-export function engineLabel(id: string | null | undefined): string {
+export function engineLabel(id: string | null | undefined, config: EngineWorkspace | null = {}): string {
+  if (id === 'cursor' && cursorHarnessEnabled(config)) {
+    return HARNESS_DEFINITIONS.find(d => d.id === 'cursor')?.label ?? 'Cursor';
+  }
   return ENGINES.find((e) => e.id === id)?.label ?? ENGINES[0].label;
 }
 
@@ -161,9 +171,14 @@ export function engineLabel(id: string | null | undefined): string {
  * snapshot. tests/a-codex-row-from-august-still-runs-on-claude.test.mts pins the
  * caller list.
  */
-export function availableEngines(found: EnginesFound = {}): Engine[] {
+export function availableEngines(found: EnginesFound = {}, config: EngineWorkspace | null = {}): Engine[] {
   const home = homeEngine(found);
-  return ENGINES.filter((e) => e.id === home || (e.id !== DEFAULT_ENGINE && found[e.id]));
+  const list = ENGINES.filter((e) => e.id === home || (e.id !== DEFAULT_ENGINE && found[e.id]));
+  if (cursorHarnessEnabled(config) && found.cursor) {
+    const def = HARNESS_DEFINITIONS.find(d => d.id === 'cursor');
+    if (def && !list.some(e => e.id === 'cursor')) list.push({ id: def.id, label: def.label, word: def.word });
+  }
+  return list;
 }
 
 /**
@@ -193,8 +208,8 @@ export function engineFor(
 ): string {
   if (homeEngine(found) !== DEFAULT_ENGINE) return homeEngine(found);
   if (enabled !== ENGINE_CHOICE_ENABLED) return DEFAULT_ENGINE;
-  const wanted = isEngine(item?.engine) && !engineChoiceOnRowIsStale(item, config) ? item.engine : null;
-  const fallback = isEngine(config?.engine) && !engineDefaultIsStale(config) ? config.engine : DEFAULT_ENGINE;
+  const wanted = isEngine(item?.engine, config) && !engineChoiceOnRowIsStale(item, config) ? item.engine : null;
+  const fallback = isEngine(config?.engine, config) && !engineDefaultIsStale(config) ? config.engine : DEFAULT_ENGINE;
   const pick = wanted ?? fallback;
   if (pick === DEFAULT_ENGINE) return DEFAULT_ENGINE;
   return found[pick] ? pick : DEFAULT_ENGINE;

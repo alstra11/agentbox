@@ -153,7 +153,7 @@ import { effortLabel, isEffort, isEffortWord } from '../shared/effort-levels.mts
 // for every row on every machine, including one she marked `codex` in August.
 import {
   engineFor, engineLabel, engineChoiceSince, engineChoiceOnRowIsStale,
-  availableEngines, isEngine, modelForEngine, homeEngine,
+  availableEngines, isEngine, modelForEngine, homeEngine, cursorHarnessEnabled,
   ENGINE_CHOICE_ENABLED, DEFAULT_ENGINE, DEFAULT_CLAUDE_MODEL, ENGINE_IDS,
 } from '../shared/engines.mts';
 import { createCodexAppServer } from './codex-app-server.mts';
@@ -166,6 +166,8 @@ import type { CodexServerClient, ConnectionServer, ConnectionServers } from './c
 import { CODEX_DEFAULT_MODE, isCodexMode } from '../shared/codex-modes.mts';
 import { cloudCodexMode } from './cloud-permission.mts';
 import { createCodexApprovals } from './codex-approvals.mts';
+import { createCursorSpool } from './cursor-spool.mts';
+import { createCursorWorker } from './cursor-worker.mts';
 import { approvalPublicKey, listPending } from './approvals.mts';
 import { connectionLine, filesComeFirst } from '../shared/connections-catalog.mts';
 import { codexDefaultModel, codexHome, codexKnownSlugs, codexModelLevels, codexModels } from './codex-models.mts';
@@ -302,6 +304,7 @@ export interface SupervisorConfig {
   authProfiles?: string[] | null;
   codexProfiles?: string[] | null;
   codexBin?: string | null;
+  cursorBin?: string | null;
   claudeBin?: string | null;
   codexHome?: string | null;
   codexModel?: string | null;
@@ -1449,6 +1452,7 @@ export class Supervisor {
   declare _newThreadKits: Map<string, NewKitRec> | undefined;
 
   declare _codexCards: ReturnType<typeof createCodexApprovals> | undefined;
+  declare _cursorCards: ReturnType<typeof createCursorSpool> | undefined;
   declare _codexLimits: CodexUsage | undefined;
   declare _codexServers: Map<string, CodexServerEntry> | undefined;
 
@@ -10276,9 +10280,9 @@ export class Supervisor {
   engineChoices() {
     // A Mac with only Codex is offered Codex whether or not the gate is open:
     // one engine is not a choice, so there is nothing for the gate to hold.
-    if (this._homeEngine() !== DEFAULT_ENGINE) return availableEngines(this._enginesFound());
-    if (!this.engineChoiceOpened()) return availableEngines();
-    return availableEngines(this._enginesFound());
+    if (this._homeEngine() !== DEFAULT_ENGINE) return availableEngines(this._enginesFound(), this.config);
+    if (!this.engineChoiceOpened()) return availableEngines({}, this.config);
+    return availableEngines(this._enginesFound(), this.config);
   }
 
   /**
@@ -10295,7 +10299,9 @@ export class Supervisor {
     // come from the sign-in check (main/engine-setup.mts); until it has
     // answered, nothing moves.
     const claudeSignedOut = this.config.claudeSignedIn === false && codex && this.config.codexSignedIn === true;
-    return { claude: this.config.claudeFound !== false && !claudeSignedOut, codex };
+    const base = { claude: this.config.claudeFound !== false && !claudeSignedOut, codex };
+    if (!cursorHarnessEnabled(this.config)) return base;
+    return { ...base, cursor: !!this.config.cursorBin };
   }
 
   /** What runs when nobody chose: Claude Code, or Codex on a Mac without it. */
@@ -11284,6 +11290,48 @@ export class Supervisor {
    */
   codexCardChanged(id: string, shown: unknown) {
     return this._codexCards?.changed(id, shown) ?? false;
+  }
+
+  _cursorApprovals() {
+    if (!this._cursorCards) {
+      this._cursorCards = createCursorSpool({
+        storeRoot: this.config.storeRoot,
+        onChange: () => this.onChange?.(),
+      });
+    }
+    return this._cursorCards;
+  }
+
+  settleCursorApproval(id: string, allow: boolean, note?: string | null) {
+    return this._cursorCards?.settle(id, allow, note ?? null) ?? false;
+  }
+
+  cursorCardChanged(id: string, shown: unknown) {
+    return this._cursorCards?.cardChanged(id, shown) ?? false;
+  }
+
+  _cursorMcpServers(): unknown[] {
+    const servers = this.mcpServers();
+    if (!servers) return [];
+    return Object.entries(servers).map(([name, entry]) => ({ name, ...entry }));
+  }
+
+  _spawnCursorWorker(plan: SpawnPlan, { cwd, item, env }: { cwd: string; item: WorkItem; env: NodeJS.ProcessEnv }) {
+    const bin = this.config.cursorBin;
+    if (!bin) throw Error('Cursor CLI is not installed on this computer');
+    let worker: ReturnType<typeof createCursorWorker> | null = null;
+    const cards = this._cursorApprovals().scope({ product: item.product, item: item.id });
+    worker = createCursorWorker({
+      bin,
+      cwd,
+      env,
+      plan: { prompt: plan.prompt, resumeId: plan.resumeId, model: plan.model, mcpServers: this._cursorMcpServers() },
+      spool: cards,
+    });
+    worker.once('exit', () => {
+      try { this._cursorApprovals().close('the run that asked this has stopped'); } catch { /* gone */ }
+    });
+    return worker;
   }
 
   // A loaded app-server thread holds Codex's writer lock even after its turn
