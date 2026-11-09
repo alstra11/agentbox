@@ -12,4 +12,4 @@ tag = "v1"
 new_sqlite_classes = ["RelayRoom"]
 
 [vars]
-# Override with `wrangler secret put MAC_TOKEN` and CLIENT_TOKEN.
+# Override with `wrangler secret put MAC_TOKEN`, IPHONE_TOKEN, WATCH_TOKEN.

@@ -5,8 +5,6 @@ import type { PhoneCommandSeen } from './phone-snapshot.mts';
 export interface RelayConfig {
   url: string;
   macToken: string;
-  /** Defaults to macToken when omitted; give the phone app its own secret. */
-  clientToken?: string;
   ntfyUrl?: string;
   ntfyTopic?: string;
   /** Projects on the relay; default is every non-practice product when unset. */

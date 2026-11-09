@@ -41,7 +41,6 @@ function relayOn(config: RelayServiceHooks['config']): RelayConfig | null {
   return {
     url,
     macToken,
-    clientToken: typeof r.clientToken === 'string' ? r.clientToken : undefined,
     ntfyUrl: typeof r.ntfyUrl === 'string' ? r.ntfyUrl : undefined,
     ntfyTopic: typeof r.ntfyTopic === 'string' ? r.ntfyTopic : undefined,
     projects: Array.isArray(r.projects) ? r.projects.filter((s): s is string => typeof s === 'string') : undefined,

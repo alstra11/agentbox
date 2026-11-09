@@ -2,7 +2,8 @@ import { RelayRoom } from './relay-room.ts';
 
 interface Env {
   MAC_TOKEN: string;
-  CLIENT_TOKEN: string;
+  IPHONE_TOKEN: string;
+  WATCH_TOKEN: string;
   NTFY_URL?: string;
   NTFY_TOPIC?: string;
   RELAY_ROOM: DurableObjectNamespace<RelayRoom>;

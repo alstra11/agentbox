@@ -4,9 +4,12 @@ import { checkCommand, PHONE_COMMANDS } from '../../shared/phone-snapshot.mts';
 import { needsYouFromSnapshot, macOnlineAt } from '../../shared/relay-needs-you.mts';
 import type { RelayClientStatus, RelayCommandIn, RelayMacStatus, RelayNeedsYouItem } from '../../shared/relay-types.mts';
 
+export type RelayCommandSource = 'iphone' | 'watch';
+
 export interface PhoneCommandRow {
   id: string;
   device: string;
+  source: RelayCommandSource;
   project: string | null;
   item: string | null;
   kind: string;
@@ -102,7 +105,7 @@ export class RelayStore {
     return true;
   }
 
-  addCommand(device: string, cmd: RelayCommandIn & { id: string }): string | null {
+  addCommand(device: string, cmd: RelayCommandIn & { id: string }, source: RelayCommandSource): string | null {
     const projects = Object.keys(this.data.projects);
     const hasItem = (project: string, item: string) => Boolean(this.data.threads[threadKey(project, item)]);
   const why = checkCommand(cmd, { projects, hasItem });
@@ -112,6 +115,7 @@ export class RelayStore {
     this.data.commands.push({
       id: cmd.id,
       device,
+      source,
       project: cmd.project ?? null,
       item: cmd.item ?? null,
       kind: cmd.kind,

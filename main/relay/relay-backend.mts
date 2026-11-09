@@ -50,8 +50,18 @@ export function relayBackend({
       await call('/mac/settings', { method: 'PUT', body: JSON.stringify({ settings: { name, ...settings as object }, ntfy }) });
     },
     async waitingPhoneCommands(_device) {
-      const out = await call('/mac/commands', { method: 'GET' }) as { commands?: unknown[] };
-      return (out.commands ?? []) as Awaited<ReturnType<NonNullable<PhoneBackendCalls['waitingPhoneCommands']>>>;
+      const out = await call('/mac/commands', { method: 'GET' }) as {
+        commands?: { id: string; kind: string; project: string | null; item: string | null; payload?: Record<string, unknown>; source?: 'iphone' | 'watch'; createdAt?: string }[];
+      };
+      return (out.commands ?? []).map((c) => ({
+        id: c.id,
+        kind: c.kind,
+        project: c.project ?? '',
+        item: c.item,
+        payload: c.payload,
+        source: c.source,
+        createdAt: c.createdAt,
+      }));
     },
     async claimPhoneCommand(id) {
       const out = await call(`/mac/commands/${encodeURIComponent(id)}/claim`, { method: 'POST', body: '{}' }) as { claim: string };

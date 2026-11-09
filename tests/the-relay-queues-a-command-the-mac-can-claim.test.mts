@@ -1,29 +1,14 @@
 // THE RELAY QUEUES A COMMAND THE MAC CAN CLAIM.
 //
-// A phone client sent a reply while the Mac was asleep; when the relay handler
+// A watch client sent a reply while the Mac was asleep; when the relay handler
 // runs, the Mac token can list it, claim it, and mark it done. Measured with
 // the in-memory RelayStore, no network.
 import { describe, it, expect, vi } from 'vitest';
 import { RelayStore } from '../relay/src/relay-store.ts';
 import { handleRelay, ntfyNotify } from '../relay/src/http.ts';
 
-const env = { MAC_TOKEN: 'mac-secret', CLIENT_TOKEN: 'client-secret', NTFY_TOPIC: 'home' };
+const env = { MAC_TOKEN: 'mac-secret', IPHONE_TOKEN: 'iphone-secret', WATCH_TOKEN: 'watch-secret', NTFY_TOPIC: 'home' };
 const device = 'abcabcabcabc';
-
-async function req(method: string, path: string, role: 'mac' | 'client', body?: unknown) {
-  const headers: Record<string, string> = {
-    authorization: `Bearer ${role === 'mac' ? env.MAC_TOKEN : env.CLIENT_TOKEN}`,
-    'x-agentbox-device': device,
-  };
-  if (body !== undefined) headers['content-type'] = 'application/json';
-  return handleRelay(
-    new Request(`https://agents.example${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) }),
-    new RelayStore(),
-    env,
-    device,
-    vi.fn(),
-  );
-}
 
 describe('the relay command queue', () => {
   it('refuses a client without the token', async () => {
@@ -43,7 +28,7 @@ describe('the relay command queue', () => {
       new Request('https://x/client/commands', {
         method: 'POST',
         headers: {
-          authorization: `Bearer ${env.CLIENT_TOKEN}`,
+          authorization: `Bearer ${env.IPHONE_TOKEN}`,
           'content-type': 'application/json',
           'x-agentbox-device': device,
         },
@@ -55,6 +40,8 @@ describe('the relay command queue', () => {
       vi.fn(),
     );
     expect(res.status).toBe(200);
+    const queued = store.waitingCommands(device)[0];
+    expect(queued?.source).toBe('iphone');
     res = await handleRelay(
       new Request('https://x/mac/commands', {
         headers: { authorization: `Bearer ${env.MAC_TOKEN}`, 'x-agentbox-device': device },
@@ -64,8 +51,9 @@ describe('the relay command queue', () => {
       device,
       vi.fn(),
     );
-    const list = await res.json() as { commands: { id: string; kind: string }[] };
+    const list = await res.json() as { commands: { id: string; kind: string; source: string }[] };
     expect(list.commands).toHaveLength(1);
+    expect(list.commands[0].source).toBe('iphone');
     const id = list.commands[0].id;
     const claim = await handleRelay(
       new Request(`https://x/mac/commands/${id}/claim`, {

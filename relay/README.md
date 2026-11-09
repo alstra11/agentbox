@@ -14,15 +14,28 @@ Snapshots, the command queue, notify dedup, and Mac heartbeat belong in one plac
 cd relay
 npm install
 npx wrangler login   # once
-npx wrangler secret put MAC_TOKEN      # Mac / Agentbox
-npx wrangler secret put CLIENT_TOKEN   # iOS app
+npx wrangler secret put MAC_TOKEN      # Mac / Agentbox — /mac/* only
+npx wrangler secret put IPHONE_TOKEN   # iOS app — /client/* only
+npx wrangler secret put WATCH_TOKEN    # watchOS app — /client/* only
 # optional defaults when the Mac does not send its own topic:
 npx wrangler secret put NTFY_TOPIC
 npx wrangler secret put NTFY_URL       # default https://ntfy.sh
 npx wrangler deploy
 ```
 
-Do **not** commit tokens. The Worker refuses `/mac/*` and `/client/*` without the right bearer.
+Do **not** commit tokens. Tokens are compared in constant time. A client token is rejected on `/mac/*`; the Mac token is rejected on `/client/*`.
+
+### Rotating one device
+
+Generate a new random secret, update it, and roll only that app:
+
+```bash
+# Example: new Watch token without touching Mac or iPhone
+npx wrangler secret put WATCH_TOKEN
+# Update the watch app’s stored token, then release. Mac and iPhone keep working.
+```
+
+To revoke a lost phone: `wrangler secret put IPHONE_TOKEN` with a new value (or remove the app’s copy of the old token). The Mac token and the other client token stay valid.
 
 ## Mac setup (`zero.config.json`)
 
@@ -46,12 +59,15 @@ Do **not** commit tokens. The Worker refuses `/mac/*` and `/client/*` without th
 
 ## Auth
 
-| Role | Header |
-|------|--------|
-| Mac | `Authorization: Bearer <MAC_TOKEN>` |
-| Client | `Authorization: Bearer <CLIENT_TOKEN>` |
+| Caller | Token secret | Routes |
+|--------|----------------|--------|
+| Agentbox Mac | `MAC_TOKEN` | `/mac/*` only |
+| iPhone app | `IPHONE_TOKEN` | `/client/*` only |
+| Watch app | `WATCH_TOKEN` | `/client/*` only |
 
-Both roles send `X-Agentbox-Device: <12-hex id>` (the Mac uses its existing phone device id).
+Header: `Authorization: Bearer <token>`. Both Mac and clients send `X-Agentbox-Device: <12-hex id>` (the Mac uses its existing phone device id).
+
+Each queued command carries `source: "iphone" | "watch"` so the Mac log and command payload (`relaySource`) show which client sent it.
 
 ## HTTP API (for the SwiftUI client)
 
@@ -156,7 +172,7 @@ Mac queue snapshot: `{ "at", "paused"?, "stalled"?, "queued"?, "runNow"?, "versi
 
 #### `GET /mac/commands`
 
-**200** `{ "commands": [ ... ] }` — waiting commands, oldest first.
+**200** `{ "commands": [ ... ] }` — waiting commands, oldest first. Each row includes `source`: `"iphone"` or `"watch"`.
 
 #### `POST /mac/commands/:id/claim`
 

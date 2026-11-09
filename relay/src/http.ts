@@ -2,13 +2,12 @@
 
 import { RelayStore } from './relay-store.ts';
 import type { RelayCommandIn, RelayMacStatus } from '../../shared/relay-types.mts';
+import { authorize } from './auth.ts';
+import type { RelayClientSource } from './auth.ts';
 
-export type RelayEnv = {
-  MAC_TOKEN: string;
-  CLIENT_TOKEN: string;
-  NTFY_URL?: string;
-  NTFY_TOPIC?: string;
-};
+import type { RelayEnv } from './env.ts';
+
+export type { RelayEnv } from './env.ts';
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8' } });
@@ -22,13 +21,6 @@ function bad(msg: string) {
   return json({ error: msg }, 400);
 }
 
-function token(req: Request, role: 'mac' | 'client', env: RelayEnv) {
-  const auth = req.headers.get('authorization') ?? '';
-  const m = auth.match(/^Bearer\s+(.+)$/i);
-  const got = m?.[1]?.trim();
-  const want = role === 'mac' ? env.MAC_TOKEN : env.CLIENT_TOKEN;
-  return got && want && got === want;
-}
 
 export async function ntfyNotify(
   items: { id: string; title: string; question: string; project: string }[],
@@ -70,8 +62,10 @@ export async function handleRelay(
   const mac = path.startsWith('/mac/');
   const client = path.startsWith('/client/');
   if (!mac && !client) return json({ error: 'not found' }, 404);
-  if (mac && !token(req, 'mac', env)) return unauthorized();
-  if (client && !token(req, 'client', env)) return unauthorized();
+  const auth = authorize(req, env, mac ? 'mac' : 'client');
+  if (!auth.ok) return unauthorized();
+  let clientSource: RelayClientSource | null = null;
+  if (auth.ok && auth.role === 'client') clientSource = auth.source;
 
   if (mac && path === '/mac/project' && req.method === 'PUT') {
     const body = await req.json() as { project: string; name: string; cloud?: boolean };
@@ -159,7 +153,8 @@ export async function handleRelay(
   if (client && path === '/client/commands' && req.method === 'POST') {
     const body = await req.json() as RelayCommandIn & { id?: string };
     const id = body.id ?? crypto.randomUUID();
-    const why = store.addCommand(device, { ...body, id, project: body.project ?? undefined, item: body.item ?? undefined });
+    if (!clientSource) return unauthorized();
+    const why = store.addCommand(device, { ...body, id, project: body.project ?? undefined, item: body.item ?? undefined }, clientSource);
     if (why) return bad(why);
     return json({ id, ok: true });
   }
