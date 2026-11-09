@@ -1,0 +1,666 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0ECA0052104151B8E2FB6E05 /* AgentboxKit in Frameworks */ = {isa = PBXBuildFile; productRef = CBA897C7EDAA560D352E3B8A /* AgentboxKit */; };
+		2532DE12DDE55EFD6B0A700B /* WatchThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04291F606306C44A6543961A /* WatchThreadView.swift */; };
+		2AA8E8CFB5B1C3F8D9D160F4 /* ThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CE9E801FC6364B0FAD33B7 /* ThreadView.swift */; };
+		2E990A366972BCB1CA75CC34 /* InboxModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A02DAB9632D8BA76BB7BFA09 /* InboxModel.swift */; };
+		373DB260D177A57A829B4AB0 /* PhoneLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AA012D5387B29670D7EB4E8 /* PhoneLink.swift */; };
+		385A27A2B23641A16B16DB34 /* AgentboxWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 995EEFEB9CE08D4AD2100C8D /* AgentboxWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3B6A6CFF576E065945CDA32F /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4374D4A33018CC27E9FCBB /* WatchModel.swift */; };
+		3B9F3594BD015F9694D86E5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCD72C97697B80D44534161 /* SettingsView.swift */; };
+		42995A28B45C9D50E568BD84 /* ComplicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5CD9903933ECB1473851CDB /* ComplicationWidget.swift */; };
+		60BA15724E499B2F81E28982 /* AgentboxWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6289A2A7434784BAB7B490 /* AgentboxWatchApp.swift */; };
+		680370ECB488DA6D7748F739 /* WatchLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842E8A66B6C80EAB38B99D58 /* WatchLink.swift */; };
+		7CBDAB2706E2C85BBAC8FCFF /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507314AAC0663EA2F79DD848 /* InboxView.swift */; };
+		83B0CCDBF0019BAC11AFC01B /* AgentboxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D008E394796230E799064D24 /* AgentboxApp.swift */; };
+		8BDF74526392AF42E241A504 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 322D7CA5E2F214096B887B43 /* Assets.xcassets */; };
+		93479EB42D0A51645B8CEAF5 /* WatchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF253B5CD5061D126348ED58 /* WatchSettingsView.swift */; };
+		B4775D0BB8BC4AE6FE2E63F9 /* WatchInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F2F759BE0494E587AC8AF1 /* WatchInboxView.swift */; };
+		BB200D43D474119CD5EFE7C7 /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646C60B10AE8DCF4F94DDFFE /* StatusView.swift */; };
+		C4EBDBD4E9ACCBF57604BB8E /* AgentboxKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0FB51AD429EEDF32EFDEEC00 /* AgentboxKit */; };
+		EE599E5EBDDB13463D3DD10D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0BBFDCFA5001396561A98573 /* Assets.xcassets */; };
+		EFE9EFDC265CC7B4E36B8C35 /* AgentboxKit in Frameworks */ = {isa = PBXBuildFile; productRef = FFAA9282E3597232695BFDCA /* AgentboxKit */; };
+		F9BE44AC3D6544A4A6A68A5B /* AgentboxWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C7E1F5683C6E248B2AF2D1A1 /* AgentboxWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2C0FC0587E7B4E5191C4813A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6C549783CEB9F16D8743DEA1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 642530273B7D0F0F44E2F0B6;
+			remoteInfo = AgentboxWatch;
+		};
+		DF56FFC2E4F8F161C830B21E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6C549783CEB9F16D8743DEA1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A39A8CFC260AF399ED9DB648;
+			remoteInfo = AgentboxWatchWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E20EEC0E34B9E4B327F7B29C /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				385A27A2B23641A16B16DB34 /* AgentboxWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F02E48E7E398E814CEB8B162 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F9BE44AC3D6544A4A6A68A5B /* AgentboxWatchWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		00F2F759BE0494E587AC8AF1 /* WatchInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchInboxView.swift; sourceTree = "<group>"; };
+		04291F606306C44A6543961A /* WatchThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchThreadView.swift; sourceTree = "<group>"; };
+		0BBFDCFA5001396561A98573 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		13CE9E801FC6364B0FAD33B7 /* ThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadView.swift; sourceTree = "<group>"; };
+		1DCD72C97697B80D44534161 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		322D7CA5E2F214096B887B43 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3F6289A2A7434784BAB7B490 /* AgentboxWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentboxWatchApp.swift; sourceTree = "<group>"; };
+		507314AAC0663EA2F79DD848 /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxView.swift; sourceTree = "<group>"; };
+		646C60B10AE8DCF4F94DDFFE /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		6AA012D5387B29670D7EB4E8 /* PhoneLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLink.swift; sourceTree = "<group>"; };
+		7A4374D4A33018CC27E9FCBB /* WatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
+		7ED8CD2EE0C79C5010C05726 /* AgentboxKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AgentboxKit; path = AgentboxKit; sourceTree = SOURCE_ROOT; };
+		7F4505508219B6EEE0E5A1E5 /* Agentbox.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Agentbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		842E8A66B6C80EAB38B99D58 /* WatchLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLink.swift; sourceTree = "<group>"; };
+		995EEFEB9CE08D4AD2100C8D /* AgentboxWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgentboxWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A02DAB9632D8BA76BB7BFA09 /* InboxModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxModel.swift; sourceTree = "<group>"; };
+		A5CD9903933ECB1473851CDB /* ComplicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationWidget.swift; sourceTree = "<group>"; };
+		C7E1F5683C6E248B2AF2D1A1 /* AgentboxWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AgentboxWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF253B5CD5061D126348ED58 /* WatchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSettingsView.swift; sourceTree = "<group>"; };
+		D008E394796230E799064D24 /* AgentboxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentboxApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1EE83EDFCAEDECE99AC872F4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0ECA0052104151B8E2FB6E05 /* AgentboxKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3ECE368BC3CFBC2C4055C628 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EFE9EFDC265CC7B4E36B8C35 /* AgentboxKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61A639F0B08D7121AF97A2CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C4EBDBD4E9ACCBF57604BB8E /* AgentboxKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		19E9B86BDE1948D5A3746981 = {
+			isa = PBXGroup;
+			children = (
+				8E4040329D5D2E0641844FD6 /* Agentbox */,
+				9F28B740546B2DD1393D78F5 /* AgentboxWatch */,
+				D0F51B4845C96BC992041103 /* AgentboxWatchWidget */,
+				1F42757784D6D24794293780 /* Packages */,
+				71009199FDAAF07716100EDA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1F42757784D6D24794293780 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				7ED8CD2EE0C79C5010C05726 /* AgentboxKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		71009199FDAAF07716100EDA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7F4505508219B6EEE0E5A1E5 /* Agentbox.app */,
+				995EEFEB9CE08D4AD2100C8D /* AgentboxWatch.app */,
+				C7E1F5683C6E248B2AF2D1A1 /* AgentboxWatchWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8E4040329D5D2E0641844FD6 /* Agentbox */ = {
+			isa = PBXGroup;
+			children = (
+				D008E394796230E799064D24 /* AgentboxApp.swift */,
+				322D7CA5E2F214096B887B43 /* Assets.xcassets */,
+				A02DAB9632D8BA76BB7BFA09 /* InboxModel.swift */,
+				507314AAC0663EA2F79DD848 /* InboxView.swift */,
+				6AA012D5387B29670D7EB4E8 /* PhoneLink.swift */,
+				1DCD72C97697B80D44534161 /* SettingsView.swift */,
+				646C60B10AE8DCF4F94DDFFE /* StatusView.swift */,
+				13CE9E801FC6364B0FAD33B7 /* ThreadView.swift */,
+			);
+			path = Agentbox;
+			sourceTree = "<group>";
+		};
+		9F28B740546B2DD1393D78F5 /* AgentboxWatch */ = {
+			isa = PBXGroup;
+			children = (
+				3F6289A2A7434784BAB7B490 /* AgentboxWatchApp.swift */,
+				0BBFDCFA5001396561A98573 /* Assets.xcassets */,
+				00F2F759BE0494E587AC8AF1 /* WatchInboxView.swift */,
+				842E8A66B6C80EAB38B99D58 /* WatchLink.swift */,
+				7A4374D4A33018CC27E9FCBB /* WatchModel.swift */,
+				CF253B5CD5061D126348ED58 /* WatchSettingsView.swift */,
+				04291F606306C44A6543961A /* WatchThreadView.swift */,
+			);
+			path = AgentboxWatch;
+			sourceTree = "<group>";
+		};
+		D0F51B4845C96BC992041103 /* AgentboxWatchWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A5CD9903933ECB1473851CDB /* ComplicationWidget.swift */,
+			);
+			path = AgentboxWatchWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4672F64168AC20612A8501F5 /* Agentbox */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80ABAB4729F3D791D5F674B2 /* Build configuration list for PBXNativeTarget "Agentbox" */;
+			buildPhases = (
+				5993937811C85CB4C7A8D8BB /* Sources */,
+				5D3463D47978F4CDF8F7D2E3 /* Resources */,
+				1EE83EDFCAEDECE99AC872F4 /* Frameworks */,
+				E20EEC0E34B9E4B327F7B29C /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				58F1ACB469D98C4DB31222A4 /* PBXTargetDependency */,
+			);
+			name = Agentbox;
+			packageProductDependencies = (
+				CBA897C7EDAA560D352E3B8A /* AgentboxKit */,
+			);
+			productName = Agentbox;
+			productReference = 7F4505508219B6EEE0E5A1E5 /* Agentbox.app */;
+			productType = "com.apple.product-type.application";
+		};
+		642530273B7D0F0F44E2F0B6 /* AgentboxWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0B82E8D3A2ED19A4C7293F7 /* Build configuration list for PBXNativeTarget "AgentboxWatch" */;
+			buildPhases = (
+				705205EC250A23F785778E1F /* Sources */,
+				FE9B2124157E6DDB0A5779B3 /* Resources */,
+				61A639F0B08D7121AF97A2CD /* Frameworks */,
+				F02E48E7E398E814CEB8B162 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C1B3B354FEF37AD32C59C973 /* PBXTargetDependency */,
+			);
+			name = AgentboxWatch;
+			packageProductDependencies = (
+				0FB51AD429EEDF32EFDEEC00 /* AgentboxKit */,
+			);
+			productName = AgentboxWatch;
+			productReference = 995EEFEB9CE08D4AD2100C8D /* AgentboxWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A39A8CFC260AF399ED9DB648 /* AgentboxWatchWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0CF5AE3EFC70772BE296599 /* Build configuration list for PBXNativeTarget "AgentboxWatchWidget" */;
+			buildPhases = (
+				2F6C4DE79B576D1DF320B8FE /* Sources */,
+				3ECE368BC3CFBC2C4055C628 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AgentboxWatchWidget;
+			packageProductDependencies = (
+				FFAA9282E3597232695BFDCA /* AgentboxKit */,
+			);
+			productName = AgentboxWatchWidget;
+			productReference = C7E1F5683C6E248B2AF2D1A1 /* AgentboxWatchWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6C549783CEB9F16D8743DEA1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					4672F64168AC20612A8501F5 = {
+						ProvisioningStyle = Automatic;
+					};
+					642530273B7D0F0F44E2F0B6 = {
+						ProvisioningStyle = Automatic;
+					};
+					A39A8CFC260AF399ED9DB648 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = B18802FD6E48C3F136423098 /* Build configuration list for PBXProject "Agentbox" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = de;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				de,
+			);
+			mainGroup = 19E9B86BDE1948D5A3746981;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A41456681A7CD506E43E1090 /* XCLocalSwiftPackageReference "AgentboxKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4672F64168AC20612A8501F5 /* Agentbox */,
+				642530273B7D0F0F44E2F0B6 /* AgentboxWatch */,
+				A39A8CFC260AF399ED9DB648 /* AgentboxWatchWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5D3463D47978F4CDF8F7D2E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BDF74526392AF42E241A504 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE9B2124157E6DDB0A5779B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE599E5EBDDB13463D3DD10D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2F6C4DE79B576D1DF320B8FE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				42995A28B45C9D50E568BD84 /* ComplicationWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5993937811C85CB4C7A8D8BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83B0CCDBF0019BAC11AFC01B /* AgentboxApp.swift in Sources */,
+				2E990A366972BCB1CA75CC34 /* InboxModel.swift in Sources */,
+				7CBDAB2706E2C85BBAC8FCFF /* InboxView.swift in Sources */,
+				373DB260D177A57A829B4AB0 /* PhoneLink.swift in Sources */,
+				3B9F3594BD015F9694D86E5A /* SettingsView.swift in Sources */,
+				BB200D43D474119CD5EFE7C7 /* StatusView.swift in Sources */,
+				2AA8E8CFB5B1C3F8D9D160F4 /* ThreadView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		705205EC250A23F785778E1F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60BA15724E499B2F81E28982 /* AgentboxWatchApp.swift in Sources */,
+				B4775D0BB8BC4AE6FE2E63F9 /* WatchInboxView.swift in Sources */,
+				680370ECB488DA6D7748F739 /* WatchLink.swift in Sources */,
+				3B6A6CFF576E065945CDA32F /* WatchModel.swift in Sources */,
+				93479EB42D0A51645B8CEAF5 /* WatchSettingsView.swift in Sources */,
+				2532DE12DDE55EFD6B0A700B /* WatchThreadView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		58F1ACB469D98C4DB31222A4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 642530273B7D0F0F44E2F0B6 /* AgentboxWatch */;
+			targetProxy = 2C0FC0587E7B4E5191C4813A /* PBXContainerItemProxy */;
+		};
+		C1B3B354FEF37AD32C59C973 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A39A8CFC260AF399ED9DB648 /* AgentboxWatchWidget */;
+			targetProxy = DF56FFC2E4F8F161C830B21E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		32DADF2DEB109B516FF727BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Agentbox/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Agentbox;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.agentbox.iphone;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		61327FB94B33AA36E288211E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AgentboxWatchWidget/Widget.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AgentboxWatchWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.agentbox.iphone.watchkitapp.widget;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		64EAFB3B9F9F1FCE9977CFEC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AgentboxWatch/Watch.entitlements;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AgentboxWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Agentbox;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = dev.agentbox.iphone;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.agentbox.iphone.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		879308010B9A0FCFD0A83EFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Agentbox/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Agentbox;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.agentbox.iphone;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		8EC54AE29BBE61EF8FA390CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AgentboxWatchWidget/Widget.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AgentboxWatchWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.agentbox.iphone.watchkitapp.widget;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		E4D3C9A315CFE2C6A78BF9CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AgentboxWatch/Watch.entitlements;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AgentboxWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Agentbox;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = dev.agentbox.iphone;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.agentbox.iphone.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		F28AF60D8EE24B863603C2F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		F64844046645C00D732BF7E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		80ABAB4729F3D791D5F674B2 /* Build configuration list for PBXNativeTarget "Agentbox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32DADF2DEB109B516FF727BE /* Debug */,
+				879308010B9A0FCFD0A83EFB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B18802FD6E48C3F136423098 /* Build configuration list for PBXProject "Agentbox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F64844046645C00D732BF7E6 /* Debug */,
+				F28AF60D8EE24B863603C2F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C0B82E8D3A2ED19A4C7293F7 /* Build configuration list for PBXNativeTarget "AgentboxWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E4D3C9A315CFE2C6A78BF9CF /* Debug */,
+				64EAFB3B9F9F1FCE9977CFEC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E0CF5AE3EFC70772BE296599 /* Build configuration list for PBXNativeTarget "AgentboxWatchWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8EC54AE29BBE61EF8FA390CF /* Debug */,
+				61327FB94B33AA36E288211E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A41456681A7CD506E43E1090 /* XCLocalSwiftPackageReference "AgentboxKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = AgentboxKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0FB51AD429EEDF32EFDEEC00 /* AgentboxKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AgentboxKit;
+		};
+		CBA897C7EDAA560D352E3B8A /* AgentboxKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AgentboxKit;
+		};
+		FFAA9282E3597232695BFDCA /* AgentboxKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AgentboxKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6C549783CEB9F16D8743DEA1 /* Project object */;
+}
