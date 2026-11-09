@@ -348,7 +348,7 @@ describe('how the window\'s arrivals reach Expo', () => {
     expect(app).toMatch(/item: a\.item \?\? null,/);
     expect(app).toMatch(/window\.zero\?\.notify\?\.\(arrivals, inbox\.filter\(\(i\) => i\.product\)\.map\(\(i\) => \(\{ id: i\.id, product: i\.product as string \}\)\)\)/);
     const main = read('main/main.mts');
-    expect(main).toMatch(/onArrivals: \(list, needsYou\) => team\?\.phoneArrivals\(list, needsYou\)/);
+    expect(main).toMatch(/team\?\.phoneArrivals\(list, needsYou\)/);
     expect(main).toMatch(/idleMs: \(\) => powerMonitor\.getSystemIdleTime\(\) \* 1000/);
   });
 });

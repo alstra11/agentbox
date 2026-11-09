@@ -103,6 +103,8 @@ export interface PhoneCommand {
   project: string;
   item?: string | null;
   payload?: CommandPayload;
+  /** Relay-only: which client token sent this (`iphone` or `watch`). */
+  source?: 'iphone' | 'watch';
   claimedBy?: unknown;
   takenAt?: unknown;
   createdAt?: string;
@@ -601,6 +603,7 @@ export function createPhoneInbox({
         // A reply to a thread started on the phone goes to the row it became.
         const item = cmd.item && state.made[cmd.item] ? state.made[cmd.item].id : cmd.item;
         const resolved = { ...cmd, item };
+        if (cmd.source) log(`phone: relay ${cmd.source}: ${cmd.kind} ${cmd.id}`);
         const why = checkCommand(resolved, { projects: slugs, hasItem: (project, id) => listItems(project).some((i) => i.id === id) });
         if (why) outcome = `refused: ${why}`;
         else {
@@ -627,6 +630,9 @@ export function createPhoneInbox({
               outcome = `refused: ${err.message}`;
             }
             if (ready) {
+              if (cmd.source) {
+                ready = { ...ready, payload: { ...ready.payload, relaySource: cmd.source } };
+              }
               try {
                 const ownAlerts = cmd.kind === 'setting' && !!alerts?.takesSetting(ready.payload);
                 const out: ChannelResult | null | undefined = ownAlerts ? await alerts!.setting(ready.payload as AlertsChange) : await apply(ready);

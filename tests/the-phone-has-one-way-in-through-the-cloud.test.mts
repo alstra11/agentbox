@@ -51,10 +51,17 @@ describe('Settings › Phone', () => {
 });
 
 describe('the Cloudflare relay', () => {
-  it('is gone: its worker, the Mac\'s client and its locks', () => {
-    for (const gone of ['relay', 'main/relay-client.mjs', 'main/relay-address.mjs', 'shared/relay-crypto.mjs', 'shared/relay-address.mjs']) {
+  it('does not bring back the old phone-door relay client', () => {
+    for (const gone of ['main/relay-client.mjs', 'main/relay-address.mjs', 'shared/relay-crypto.mjs', 'shared/relay-address.mjs']) {
       expect(exists(gone), gone).toBe(false);
     }
+  });
+
+  it('keeps the optional agents worker for a native client, not a second QR door', () => {
+    const mainSrc = read('main/main.mts');
+    expect(exists('relay/wrangler.toml')).toBe(true);
+    expect(mainSrc).toMatch(/startRelayService/);
+    expect(mainSrc).not.toMatch(/createPhoneLink|relayAddress|relay-address/);
   });
 
   it('has no command left to build, try or deploy it', () => {
