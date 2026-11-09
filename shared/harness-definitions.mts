@@ -152,6 +152,29 @@ export const HARNESS_DEFINITIONS: readonly HarnessDefinition[] = freeze([
     // false until somebody turns it on deliberately.
     admitted: false,
   },
+  {
+    // CURSOR CLI (agent acp), registered but not offered until `cursorHarness`
+    // is true in zero.config.json (see shared/engines.mts).
+    id: 'cursor', label: 'Cursor', word: 'Cursor', binKey: 'cursorBin',
+    homeEnv: 'CURSOR_CONFIG_DIR', accountPrefix: 'cursor:', package: 'cursor-agent', // pragma: allowlist secret
+    commandMenu: 'cursor', commandRoute: 'cursor',
+    casks: [],
+    installer: { shell: '/bin/bash', url: 'https://cursor.com/install', pipe: 'bash' },
+    loginArgs: ['login'], statusArgs: ['status', '--format', 'json'],
+    credentialFiles: ['auth.json'],
+    scrubPatterns: [
+      '^ANTHROPIC_', '^CLAUDE_CODE_', '^CLAUDECODE$', '^CLAUDE_PID$', '^CLAUDE_EFFORT$',
+      '^CLAUDE_CONFIG_DIR$', '^CLAUDE_SECURESTORAGE_CONFIG_DIR$',
+      '^OPENAI_', '^CODEX_', '^CURSOR_', '^CURSOR_API_KEY$',
+      '_API_KEY$', '_ACCESS_TOKEN$',
+    ],
+    capabilities: {
+      nativeCommands: false, fork: false, nativeReview: false, remoteControl: false,
+      inlineImages: false, claudeEffort: false, planLimits: false,
+    },
+    imageInstruction: 'Open each one with the read tool, at the absolute path below.',
+    admitted: false,
+  },
 ]);
 export function harnessDefinition(id: string = 'claude'): HarnessDefinition | null {
   return HARNESS_DEFINITIONS.find(h => h.id === id) ?? null;

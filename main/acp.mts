@@ -112,6 +112,8 @@ interface AcpClientOptions {
   clientInfo?: { name: string; version: string };
   onNotification?: ((method: string, params: unknown) => void) | null;
   onPermission?: ((request: PermissionParams & { requestId: RpcId }) => Chosen | PromiseLike<Chosen>) | null;
+  /** Cursor and other agents may call extension methods that need a JSON-RPC response. */
+  onExtension?: ((request: { requestId: RpcId; method: string; params: unknown }) => unknown | PromiseLike<unknown>) | null;
   permissionTimeoutMs?: number;
   requestTimeoutMs?: number;
   maxFrameLength?: number;
@@ -158,6 +160,7 @@ export function createAcpClient({
   clientInfo = { name: 'agentbox', version: '1.0.0' },
   onNotification = null,
   onPermission = null,
+  onExtension = null,
   permissionTimeoutMs = PERMISSION_TIMEOUT_MS,
   requestTimeoutMs = REQUEST_TIMEOUT_MS,
   maxFrameLength = MAX_FRAME_LENGTH,
@@ -262,6 +265,18 @@ export function createAcpClient({
     }
     if (message.id != null && message.method) {
       if (message.method === 'session/request_permission') return void askPermission(message.id, message.params as PermissionParams | null | undefined);
+      if (onExtension) {
+        (async () => {
+          const id = message.id as RpcId;
+          try {
+            const result = await onExtension({ requestId: id, method: message.method!, params: message.params ?? {} });
+            write({ jsonrpc: '2.0', id, result: result ?? null });
+          } catch (error) {
+            write({ jsonrpc: '2.0', id, error: { code: -32603, message: (error as Error).message ?? 'failed' } });
+          }
+        })();
+        return;
+      }
       // Everything else is a capability we did not advertise. Say so.
       write({ jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `${message.method} is not supported by this client` } });
       return;

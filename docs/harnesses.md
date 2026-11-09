@@ -233,6 +233,36 @@ been worked through, the approval handler is not yet joined to the inbox's own
 card spool (`sup._openCodeApprovals`), and the QA campaign that the Codex
 harness got (w-36c51443df) has not been run against this one.
 
+## Cursor CLI (experimental, off by default)
+
+The adapter is `main/harnesses/cursor.mts` with the worker in `main/cursor-worker.mts`
+over **ACP** (`agent acp` on stdio — not print mode with `--force`, and not
+`--worktree`; Agentbox owns the task folder as `cwd`). Permissions use the same
+approvals spool as the other engines; `cursor/ask_question` lands there as a
+multiple-choice card. `cursor/create_plan` is auto-accepted until plan review is
+wired to the inbox.
+
+**Enable on this fork:** set `"cursorHarness": true` in `zero.config.json`,
+install the CLI (`curl https://cursor.com/install -fsS | bash`), run
+`agent login`, and optionally set `cursorBin` if the search cannot find `agent`.
+The harness stays `admitted: false` in data so upstream pickers stay unchanged;
+the flag is what offers it.
+
+**Credentials:** `CURSOR_API_KEY` and other provider keys are stripped from the
+worker environment; runs rely on `agent login` like the other subscription
+harnesses.
+
+**MCP:** per-task servers from `writeMcpConfig` are passed into `session/new`.
+Whether the Cursor CLI honours per-session MCP grants the way Codex does has not
+been verified end-to-end on a signed-in Mac; global Cursor MCP config may still
+apply.
+
+**Not verified without a live Cursor session:** model list freshness, cloud
+handoff, and whether `agent acp` exposes AskQuestion on all builds (see Cursor
+forum reports). Tests use a fake ACP agent.
+
+Sources: [Cursor CLI](https://cursor.com/docs/cli), [Cursor ACP](https://cursor.com/docs/cli/acp).
+
 Sources: [OpenCode providers](https://opencode.ai/docs/providers/),
 [OpenCode CLI](https://opencode.ai/docs/cli/),
 [OpenCode server](https://opencode.ai/docs/server/),

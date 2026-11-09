@@ -79,6 +79,8 @@ Two of this repo's dependencies need an install script to work: `node-pty`, whic
 
 `npm start` builds the app and opens it. On first run it walks you through connecting Claude Code or Codex and choosing a folder to work in.
 
+This fork can also run the **Cursor CLI** over ACP when you set `"cursorHarness": true` in `zero.config.json`, install the CLI (`curl https://cursor.com/install -fsS | bash`), and run `agent login`. See [docs/harnesses.md](docs/harnesses.md#cursor-cli-experimental-off-by-default).
+
 On macOS, the system may ask to let Terminal find devices on your local network. Agentbox does not need that, so Don't Allow is fine.
 
 ## The chat window is the bottleneck
