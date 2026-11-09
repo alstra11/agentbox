@@ -4,6 +4,10 @@ import { RelayStore } from './relay-store.ts';
 import type { RelayCommandIn, RelayMacStatus } from '../../shared/relay-types.mts';
 import { authorize } from './auth.ts';
 import type { RelayClientSource } from './auth.ts';
+import { agentProvider } from './providers.ts';
+import type { AgentProvider } from './providers.ts';
+import { noteLocalNew, routeClientCommand, sessionSnapshot } from './cloud-sessions.ts';
+import type { ClientCommand } from './cloud-sessions.ts';
 
 import type { RelayEnv } from './env.ts';
 
@@ -19,6 +23,30 @@ function unauthorized() {
 
 function bad(msg: string) {
   return json({ error: msg }, 400);
+}
+
+function pathPart(raw: string): string | null {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return null;
+  }
+}
+
+export interface RelayCall {
+  now?: number;
+  providerFor?: (id: string) => AgentProvider;
+}
+
+export async function notifyFresh(store: RelayStore, env: RelayEnv, fetchImpl: typeof fetch = fetch): Promise<number> {
+  const fresh = store.freshNeedsYou();
+  const topic = store.data.ntfy?.topic ?? env.NTFY_TOPIC;
+  const ntfyUrl = store.data.ntfy?.url ?? env.NTFY_URL ?? 'https://ntfy.sh';
+  if (fresh.length && topic) {
+    store.markNotified(fresh);
+    await ntfyNotify(fresh, topic, ntfyUrl, fetchImpl);
+  }
+  return fresh.length;
 }
 
 
@@ -51,7 +79,10 @@ export async function handleRelay(
   env: RelayEnv,
   device: string,
   fetchImpl: typeof fetch = fetch,
+  deps: RelayCall = {},
 ): Promise<Response> {
+  const now = deps.now ?? Date.now();
+  const providerFor = (id: string) => (deps.providerFor ? deps.providerFor(id) : agentProvider(id, env, fetchImpl));
   const url = new URL(req.url);
   const path = url.pathname.replace(/\/+$/, '') || '/';
 
@@ -85,14 +116,8 @@ export async function handleRelay(
     const body = await req.json() as { project: string; threads: { item: string; snapshot: unknown }[] };
     if (!body.project || !Array.isArray(body.threads)) return bad('project and threads required');
     store.putThreads(device, body.project, body.threads);
-    const fresh = store.freshNeedsYou();
-    const topic = store.data.ntfy?.topic ?? env.NTFY_TOPIC;
-    const ntfyUrl = store.data.ntfy?.url ?? env.NTFY_URL ?? 'https://ntfy.sh';
-    if (fresh.length && topic) {
-      store.markNotified(fresh);
-      await ntfyNotify(fresh, topic, ntfyUrl, fetchImpl);
-    }
-    return json({ ok: true, notified: fresh.length });
+    const notified = await notifyFresh(store, env, fetchImpl);
+    return json({ ok: true, notified });
   }
 
   if (mac && path === '/mac/threads' && req.method === 'DELETE') {
@@ -136,7 +161,11 @@ export async function handleRelay(
   }
 
   if (client && path === '/client/status' && req.method === 'GET') {
-    return json(store.clientStatus());
+    return json(store.clientStatus(now));
+  }
+
+  if (client && path === '/client/targets' && req.method === 'GET') {
+    return json(store.clientTargets(now));
   }
 
   if (client && path === '/client/projects' && req.method === 'GET') {
@@ -145,17 +174,48 @@ export async function handleRelay(
 
   const threadMatch = path.match(/^\/client\/threads\/([^/]+)\/([^/]+)$/);
   if (client && threadMatch && req.method === 'GET') {
-    const snap = store.thread(threadMatch[1], threadMatch[2]);
-    if (!snap) return json({ error: 'not found' }, 404);
-    return json({ snapshot: snap });
+    const project = pathPart(threadMatch[1]);
+    const item = pathPart(threadMatch[2]);
+    if (project === null || item === null) return json({ error: 'not found' }, 404);
+    const session = store.session(item);
+    if (session && session.project === project) {
+      return json({ snapshot: sessionSnapshot(session, store.localMachine()) });
+    }
+    const snap = store.thread(project, item);
+    if (!snap || typeof snap !== 'object') return json({ error: 'not found' }, 404);
+    return json({ snapshot: { ...(snap as Record<string, unknown>), target: 'local', provider: store.localMachine() } });
   }
 
   if (client && path === '/client/commands' && req.method === 'POST') {
-    const body = await req.json() as RelayCommandIn & { id?: string };
+    const body = await req.json() as RelayCommandIn & { id?: string; target?: string; provider?: string };
     const id = body.id ?? crypto.randomUUID();
     if (!clientSource) return unauthorized();
-    const why = store.addCommand(device, { ...body, id, project: body.project ?? undefined, item: body.item ?? undefined }, clientSource);
+    const cmd: ClientCommand = {
+      id,
+      kind: body.kind,
+      project: body.project,
+      item: body.item,
+      payload: (body.payload ?? {}) as Record<string, unknown>,
+      target: body.target,
+      provider: body.provider,
+    };
+    const routed = await routeClientCommand(store, cmd, device, providerFor, now);
+    if (routed.handled) {
+      if (!routed.result.ok) return json({ error: routed.result.error }, routed.result.status);
+      return json({
+        ok: true,
+        id: routed.result.id,
+        sessionId: routed.result.sessionId,
+        target: routed.result.target,
+        provider: routed.result.provider,
+      });
+    }
+    if (body.kind === 'new') {
+      cmd.payload = { ...(cmd.payload ?? {}), target: 'local' };
+    }
+    const why = store.addCommand(device, { ...body, id, project: body.project ?? undefined, item: body.item ?? undefined, payload: cmd.payload }, clientSource);
     if (why) return bad(why);
+    if (body.kind === 'new') noteLocalNew(store, cmd, device, now);
     return json({ id, ok: true });
   }
 

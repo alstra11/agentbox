@@ -22,7 +22,12 @@ struct StatusView: View {
                         LabeledContent("Zuletzt", value: "Noch kein Mac")
                     }
                     if status.paused { Text("Pausiert") }
-                    if !status.macOnline { Text("Was du schickst, wartet auf den Mac.") }
+                    if !status.macOnline { Text("Lokal wartet auf den Mac. Cloud läuft weiter.") }
+                    if let harnesses = status.harnesses, !harnesses.isEmpty {
+                        Text(harnesses.map(\.label).joined(separator: ", "))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 Section("Warteschlange") {
                     LabeledContent("Läuft", value: "\(status.queue.runNow.count)")

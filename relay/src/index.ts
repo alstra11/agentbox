@@ -6,6 +6,7 @@ interface Env {
   WATCH_TOKEN: string;
   NTFY_URL?: string;
   NTFY_TOPIC?: string;
+  CURSOR_API_KEY?: string;
   RELAY_ROOM: DurableObjectNamespace<RelayRoom>;
 }
 

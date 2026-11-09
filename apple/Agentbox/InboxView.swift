@@ -26,6 +26,9 @@ struct InboxView: View {
                         } label: {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(item.title).font(.headline)
+                                if let badge = executionBadge(target: item.target, provider: item.provider) {
+                                    Text(badge).font(.caption).foregroundStyle(.secondary)
+                                }
                                 Text(item.question).font(.subheadline).foregroundStyle(.secondary)
                                 HStack {
                                     Text(item.projectName)
@@ -71,25 +74,48 @@ private extension NeedsYouItem {
 struct ComposeView: View {
     @Environment(InboxModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @State private var prompt = ""
+    @State private var repo = ""
+    @State private var target = "cloud"
     @State private var slug = ""
-    @State private var title = ""
-    @State private var bodyText = ""
     @State private var fault: String?
+
+    private var macOffline: Bool { model.status?.macOnline != true }
 
     var body: some View {
         NavigationStack {
             Form {
-                Picker("Projekt", selection: $slug) {
-                    Text("Projekt").tag("")
-                    ForEach(choices, id: \.slug) { row in
-                        Text(row.name).tag(row.slug)
+                TextField("Auftrag", text: $prompt, axis: .vertical)
+                TextField("Repository", text: $repo)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                Section("Ziel") {
+                    Button { target = "cloud" } label: {
+                        choice("Cloud", on: target == "cloud")
+                    }
+                    Button { target = "local" } label: {
+                        choice("Lokal", on: target == "local")
+                    }
+                    .disabled(macOffline)
+                    if macOffline {
+                        Text("Der Mac ist aus.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } else if let names = harnessLine {
+                        Text(names).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
-                TextField("Titel", text: $title)
-                TextField("Text", text: $bodyText, axis: .vertical)
+                if target == "local" {
+                    Picker("Projekt", selection: $slug) {
+                        Text("Projekt").tag("")
+                        ForEach(choices, id: \.slug) { row in
+                            Text(row.name).tag(row.slug)
+                        }
+                    }
+                }
                 if let fault { Text(fault).foregroundStyle(.red) }
             }
-            .navigationTitle("Neu")
+            .navigationTitle("Neue Anfrage")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") { dismiss() }
@@ -98,7 +124,23 @@ struct ComposeView: View {
                     Button("Senden") { Task { await send() } }
                 }
             }
-            .task { await model.loadProjects() }
+            .task {
+                await model.loadProjects()
+                if model.status == nil { await model.refresh() }
+            }
+        }
+    }
+
+    private var harnessLine: String? {
+        let names = (model.status?.harnesses ?? []).filter(\.available).map(\.label)
+        return names.isEmpty ? nil : names.joined(separator: ", ")
+    }
+
+    private func choice(_ title: String, on: Bool) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            if on { Image(systemName: "checkmark") }
         }
     }
 
@@ -112,7 +154,15 @@ struct ComposeView: View {
     }
 
     private func send() async {
-        let built = CommandDraft.newThread(project: slug, title: title, body: bodyText, source: .iphone, id: UUID().uuidString)
+        let built = CommandDraft.newRequest(
+            prompt: prompt,
+            repo: repo,
+            target: target,
+            provider: "cursor",
+            project: target == "local" ? slug : projectSlug(fromRepo: repo),
+            source: .iphone,
+            id: UUID().uuidString
+        )
         switch built {
         case .ready(let command):
             if let fault = await model.post(command) { self.fault = fault }

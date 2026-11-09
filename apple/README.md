@@ -2,6 +2,8 @@
 
 Die App spricht nur mit dem Relay aus `relay/` (`https://agents.alstra11.workers.dev`, in den Einstellungen änderbar). iPhone und Uhr haben getrennte Tokens (`IPHONE_TOKEN` und `WATCH_TOKEN` am Worker). Die App speichert sie in der Keychain. Nichts davon liegt im Repository.
 
+Eine neue Anfrage geht an Cloud · Cursor, solange du nicht Lokal wählst. Lokal ist aus, solange der Mac seit 90 Sekunden nichts gemeldet hat, und die Zeile sagt „Der Mac ist aus.“ Jede Zeile in Braucht dich trägt ein Kennzeichen, `Cloud · Cursor` oder `Lokal · <Computername>`. Die Uhr hat dieselbe Anfrage und dasselbe Kennzeichen.
+
 Push kommt von ntfy, nicht von APNs. Ein Tipp auf die Mitteilung öffnet `agentbox://thread/<id>?project=<slug>`.
 
 Die Komplikation liest die Zahl offener Entscheidungen selbst. Die Uhr schreibt Adresse, Token und Geräte-ID in die App Group `group.dev.agentbox.relay`, die Komplikation liest sie von dort. Laut [Apples Liste für watchOS](https://developer.apple.com/help/account/reference/supported-capabilities-watchos/) hängen App Groups auf der Uhr nicht an einer bezahlten Mitgliedschaft. Keychain Sharing und Push bleiben draußen.

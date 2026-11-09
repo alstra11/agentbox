@@ -18,6 +18,9 @@ struct ThreadView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
+                if let badge = executionBadge(target: listItem?.target ?? snapshot?.target, provider: listItem?.provider ?? snapshot?.provider) {
+                    Text(badge).font(.caption).foregroundStyle(.secondary)
+                }
                 Text(question).font(.title3.weight(.semibold))
                 if let context, !context.isEmpty {
                     Text(context).font(.subheadline).foregroundStyle(.secondary)

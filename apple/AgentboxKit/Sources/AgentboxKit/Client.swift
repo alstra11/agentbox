@@ -42,6 +42,12 @@ public enum RelayError: Error, Equatable, Sendable, CustomStringConvertible, Loc
         case "a new thread needs some words": return "Text fehlt"
         case "already there": return "Schon gesendet"
         case "unauthorized": return "Token abgelehnt"
+        case "mac_offline": return "Der Mac ist aus."
+        case "cursor_unconfigured": return "Cloud ist nicht eingerichtet."
+        case "cursor_unavailable", "cursor_unauthorized": return "Cloud antwortet nicht."
+        case "provider_unavailable": return "Dieser Agent ist noch nicht da."
+        case "a cloud agent needs a repository": return "Repository fehlt"
+        case "not something a cloud session does": return "Das geht hier nicht"
         default: return why
         }
     }
@@ -98,6 +104,10 @@ public struct RelayClient: Sendable {
         try decode(ProjectList.self, from: try await load(.projects)).projects
     }
 
+    public func targets() async throws -> ClientTargets {
+        try decode(ClientTargets.self, from: try await load(.targets))
+    }
+
     public func thread(project: String, item: String) async throws -> ThreadSnapshot {
         try decode(ThreadEnvelope.self, from: try await load(.thread(project: project, item: item))).snapshot
     }
@@ -132,7 +142,7 @@ public struct RelayClient: Sendable {
             throw RelayError.unauthorized
         case 404:
             throw RelayError.notFound
-        case 400:
+        case 400, 409, 502, 503:
             struct Err: Decodable { var error: String }
             if let err = try? JSONDecoder().decode(Err.self, from: result.body), !err.error.isEmpty {
                 throw RelayError.rejected(err.error)

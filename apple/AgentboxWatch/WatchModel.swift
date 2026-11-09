@@ -10,6 +10,7 @@ final class WatchModel {
     var token: String
     private(set) var deviceID: String
     var items: [NeedsYouItem] = []
+    var status: ClientStatus?
     var error: String?
     var banner: String?
     private var seen: Set<String>?
@@ -111,7 +112,10 @@ final class WatchModel {
             return
         }
         do {
-            let loaded = try await client.needsYou()
+            async let nextItems = client.needsYou()
+            async let nextStatus = client.status()
+            let loaded = try await nextItems
+            status = try await nextStatus
             let ids = Set(loaded.map { "\($0.project)/\($0.id)" })
             if let seen, !ids.subtracting(seen).isEmpty {
                 WKInterfaceDevice.current().play(.notification)
