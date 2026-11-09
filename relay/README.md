@@ -65,7 +65,7 @@ To revoke a lost phone: `wrangler secret put IPHONE_TOKEN` with a new value (or 
 | iPhone app | `IPHONE_TOKEN` | `/client/*` only |
 | Watch app | `WATCH_TOKEN` | `/client/*` only |
 
-Header: `Authorization: Bearer <token>`. Both Mac and clients send `X-Agentbox-Device: <12-hex id>` (the Mac uses its existing phone device id).
+Header: `Authorization: Bearer <token>`. Both Mac and clients send `X-Agentbox-Device: <12-hex id>` (the Mac uses its existing phone device id). A client command is stored under the client's id. `GET /mac/commands` returns every command still waiting, so a reply from the iPhone or the Watch reaches the Mac even when the two ids differ.
 
 Each queued command carries `source: "iphone" | "watch"` so the Mac log and command payload (`relaySource`) show which client sent it.
 
@@ -172,7 +172,7 @@ Mac queue snapshot: `{ "at", "paused"?, "stalled"?, "queued"?, "runNow"?, "versi
 
 #### `GET /mac/commands`
 
-**200** `{ "commands": [ ... ] }` — waiting commands, oldest first. Each row includes `source`: `"iphone"` or `"watch"`.
+**200** `{ "commands": [ ... ] }` — every command still waiting, oldest first, whichever client device posted it. Each row includes `source` (`"iphone"` or `"watch"`) and `device` (the client's `X-Agentbox-Device`).
 
 #### `POST /mac/commands/:id/claim`
 
