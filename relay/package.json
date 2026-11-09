@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
-    "test": "vitest run",
+    "test": "cd .. && npx vitest run tests/a-cloud-session-starts-on-cursor-and-asks-when-the-run-finishes.test.mts tests/the-relay-queues-a-command-the-mac-can-claim.test.mts tests/the-relay-rejects-cross-device-tokens.test.mts tests/a-needs-you-thread-reaches-the-relay-list.test.mts tests/the-mac-relay-backend-talks-to-the-worker.test.mts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

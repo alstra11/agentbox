@@ -18,6 +18,7 @@ public enum RelayEndpoint: Equatable, Sendable {
     case needsYou
     case status
     case projects
+    case targets
     case thread(project: String, item: String)
     case commands
     case health
@@ -77,6 +78,7 @@ private func path(for endpoint: RelayEndpoint) -> String {
     case .needsYou: return "/client/needs-you"
     case .status: return "/client/status"
     case .projects: return "/client/projects"
+    case .targets: return "/client/targets"
     case .commands: return "/client/commands"
     case .health: return "/health"
     case .thread(let project, let item):

@@ -117,7 +117,10 @@ final class InboxModel {
             if let project = command.project, let item = command.item {
                 pending.insert("\(project)/\(item)")
             }
-            banner = status?.macOnline == false ? "Wartet auf den Mac." : "Gesendet."
+            let cloud = command.payload["target"] == .string("cloud")
+                || items.contains { $0.project == command.project && $0.id == command.item && $0.target == "cloud" }
+            if cloud { banner = "Läuft in der Cloud." }
+            else { banner = status?.macOnline == false ? "Wartet auf den Mac." : "Gesendet." }
             return nil
         } catch let error as RelayError {
             return error.message

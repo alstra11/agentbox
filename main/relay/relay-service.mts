@@ -8,6 +8,7 @@ import { createPhoneInbox } from '../phone-inbox.mts';
 import { phoneDevice } from '../phone-inbox.mts';
 import type { SettingsModel } from '../../shared/phone-settings.mts';
 import { relayBackend, relayPutStatus } from './relay-backend.mts';
+import { relayHarnesses } from '../../shared/relay-harnesses.mts';
 
 const SYNC_MS = 30_000;
 
@@ -116,6 +117,7 @@ export function startRelayService(hooks: RelayServiceHooks) {
         runNow: Object.entries(status.byId ?? {}).filter(([, v]) => v.state === 'next').map(([id]) => id),
         version: hooks.version,
         computerName: hooks.hostname,
+        harnesses: relayHarnesses(),
       });
     } catch (err) {
       console.warn(`relay: status: ${(err as Error).message}`);

@@ -1,6 +1,6 @@
 # agents relay (Cloudflare Worker)
 
-Opt-in relay between a Mac running Agentbox and a future iOS/watchOS client. The Mac pushes the same phone snapshots and command protocol as Supabase (`shared/phone-snapshot.mts`); the client lists **Needs you** threads, sends commands, and reads Mac status. No accounts—only bearer tokens.
+Opt-in relay between a Mac running Agentbox and the iPhone and Watch clients. The Mac pushes the same phone snapshots and command protocol as Supabase (`shared/phone-snapshot.mts`); a client lists **Needs you** threads, sends commands, and reads Mac status. Cloud agent sessions live on the same Durable Object, so a client can start and answer a Cursor cloud agent while the Mac is off. No accounts—only bearer tokens.
 
 Deploy target name: **`agents`** → `https://agents.<your-subdomain>.workers.dev` (this repo is set up for `agents.alstra11.workers.dev`).
 
@@ -17,6 +17,7 @@ npx wrangler login   # once
 npx wrangler secret put MAC_TOKEN      # Mac / Agentbox — /mac/* only
 npx wrangler secret put IPHONE_TOKEN   # iOS app — /client/* only
 npx wrangler secret put WATCH_TOKEN    # watchOS app — /client/* only
+npx wrangler secret put CURSOR_API_KEY # Cloud Agents API key — never logged
 # optional defaults when the Mac does not send its own topic:
 npx wrangler secret put NTFY_TOPIC
 npx wrangler secret put NTFY_URL       # default https://ntfy.sh
@@ -122,11 +123,12 @@ No auth. `{ "ok": true }`
   "stalled": ["w-..."],
   "queue": { "runNow": [], "queued": [] },
   "version": "0.1.22",
-  "computerName": "MacBook"
+  "computerName": "MacBook",
+  "harnesses": [{ "id": "claude", "label": "Claude Code", "available": true }]
 }
 ```
 
-`macOnline` is true when `macLastSeen` is within 120s.
+`macOnline` is true when `macLastSeen` is within 90s (the Mac heartbeat is about every 30s). `harnesses` is empty until the Mac reports one, and `available` follows `macOnline`.
 
 #### `POST /client/commands`
 
@@ -144,8 +146,53 @@ Body: phone command (see `PHONE_COMMANDS` in `shared/phone-snapshot.mts`):
 
 Kinds: `reply`, `new`, `snooze`, `close`, `stop`, `run-now`, `send-now`, `reopen`, `schedule`, `approve`, `setting`, `move-to-cloud` (same validation as the Mac).
 
-**200** `{ "ok": true, "id": "<command-id>" }`  
-**400** `{ "error": "<why>" }`
+`new` takes an optional `target` (`cloud` or `local`, default `cloud`) and `provider` (default `cursor`). They may sit on the command or in `payload`. A cloud `new` also needs `payload.repo` (`https://…` repository URL), `payload.body` (the prompt), and may set `payload.startingRef` and `payload.model`. `autoCreatePR` defaults to true.
+
+**200** `{ "ok": true, "id": "<command-id>" }`. A cloud command also returns `sessionId`, `target`, and `provider`.  
+**400** `{ "error": "<why>" }`  
+**409** `{ "error": "mac_offline" }` when `target` is `local` and the Mac has not been seen in 90s.  
+**503** `{ "error": "cursor_unconfigured" }` when `CURSOR_API_KEY` is missing.
+
+Cloud is the default. `target: "local"` is the existing Mac queue. The Mac's `GET /mac/commands` only returns commands for local work; a cloud reply, stop, close, or approval is handled on the relay and never claimed by the Mac.
+
+| Cloud command | Cursor API |
+|---------------|------------|
+| `reply`, option text, `approve` | `POST /v1/agents/{id}/runs`. If a run is active, `delivery: "steer"` (a 409 on a plain follow-up steers too). |
+| `stop` | `POST /v1/agents/{id}/runs/{runId}/cancel` |
+| `close`, or the option Schließen | `POST /v1/agents/{id}/archive` |
+
+The create prompt asks the agent to end a turn that needs a decision with one line, `NEEDS_YOU{"question","options":[{"text","recommended"}]}`. The relay parses the last valid block.
+
+#### `GET /client/targets`
+
+**200**
+
+```json
+{
+  "macOnline": true,
+  "computerName": "MacBook",
+  "defaultTarget": "cloud",
+  "harnesses": [{ "id": "claude", "label": "Claude Code", "available": true }],
+  "targets": [
+    { "target": "cloud", "provider": "cursor", "label": "Cloud · Cursor", "available": true },
+    { "target": "local", "provider": "mac", "label": "Lokal · MacBook", "available": true }
+  ]
+}
+```
+
+`harnesses` is what the Mac last reported (`claude`, `codex`). Each one is `available` only while `macOnline`. The same `harnesses` array is on `GET /client/status`. A local target is `available` only while the Mac is online.
+
+Every Needs-you item and thread snapshot includes `target` (`cloud` or `local`) and `provider` (`cursor`, or the computer name for a Mac thread).
+
+### Cloud runs
+
+`RelayRoom` stores a session per cloud agent: id, project, provider, target, Cursor agent id, run id, status, branch, prUrl, the device that started it, timestamps. An open needs-you row belongs to that session (`question`, `approval`, `review`, `error`) and carries the question, options, recommended, and answer.
+
+An alarm every 30s polls runs that are still going (`GET /v1/agents/{id}/runs/{runId}`). `FINISHED` with a `NEEDS_YOU` block becomes a question. `FINISHED` without one becomes a review (Zusammenführen / Weiter / Schließen, and the PR url when Cursor returned one). `ERROR` and `EXPIRED` become an error (Nochmal / Weiter). `CREATING`, `RUNNING`, `WAITING_FOR_BACKGROUND_WORK`, and any other non-terminal status do not ask. Each new needs-you row is pushed once through the existing ntfy path. Click is `agentbox://thread/<session id>?project=<slug>`.
+
+Auth to Cursor is HTTP Basic with `CURSOR_API_KEY` as the username and an empty password. The key is not written to logs or to error bodies.
+
+`openai-agents`, `codex-cli`, and `claude-managed` are named on the provider interface and refused with `provider_unavailable`. They are not implemented.
 
 ### Mac
 
@@ -197,7 +244,7 @@ From repo root (logic + Mac client):
 npm run test:changed relay shared/relay main/relay
 ```
 
-From `relay/` (Worker, after `npm install`):
+From `relay/` (the same vitest files, after `npm install` at the repo root):
 
 ```bash
 npm test

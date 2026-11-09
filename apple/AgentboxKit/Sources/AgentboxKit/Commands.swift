@@ -77,6 +77,7 @@ public enum CommandRefusal: Equatable, Sendable {
     case missingWords
     case noteTooLong
     case badCard
+    case missingRepo
 
     public var message: String {
         switch self {
@@ -87,6 +88,7 @@ public enum CommandRefusal: Equatable, Sendable {
         case .missingWords: return "Text fehlt"
         case .noteTooLong: return "Notiz zu lang"
         case .badCard: return "Karte fehlt"
+        case .missingRepo: return "Repository fehlt"
         }
     }
 }
@@ -190,6 +192,32 @@ public enum CommandDraft {
         return thread("approve", project: project, item: item, payload: payload, source: source, id: id)
     }
 
+    public static func newRequest(prompt: String, repo: String, target: String, provider: String, project: String?, source: ClientSource, id: String) -> BuiltCommand {
+        guard let prompt = trimmed(prompt) else { return .refusal(.missingWords) }
+        let chosen = target.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "local" ? "local" : "cloud"
+        let title = titleLine(prompt)
+        if chosen == "local" {
+            guard let project = trimmed(project ?? "") else { return .refusal(.missingProject) }
+            var payload: [String: CommandValue] = [
+                "title": .string(title),
+                "body": .string(prompt),
+                "target": .string("local"),
+            ]
+            if let repo = httpsRepo(repo) { payload["repo"] = .string(repo) }
+            return .ready(OutboundCommand(id: id, kind: "new", source: source, project: project, item: nil, payload: payload))
+        }
+        guard let repo = httpsRepo(repo) else { return .refusal(.missingRepo) }
+        let named = (provider.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "cursor" : provider.trimmingCharacters(in: .whitespacesAndNewlines)).lowercased()
+        let payload: [String: CommandValue] = [
+            "title": .string(title),
+            "body": .string(prompt),
+            "target": .string("cloud"),
+            "provider": .string(named),
+            "repo": .string(repo),
+        ]
+        return .ready(OutboundCommand(id: id, kind: "new", source: source, project: trimmed(project ?? "") ?? projectSlug(fromRepo: repo), item: nil, payload: payload))
+    }
+
     public static func newThread(project: String, title: String, body: String, source: ClientSource, id: String) -> BuiltCommand {
         guard let project = trimmed(project) else { return .refusal(.missingProject) }
         let title = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -215,6 +243,49 @@ public enum CommandDraft {
         let text = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return text.isEmpty ? nil : text
     }
+
+    private static func titleLine(_ prompt: String) -> String {
+        let line = prompt.split(whereSeparator: \.isNewline).first.map(String.init) ?? prompt
+        if line.count <= 80 { return line }
+        return String(line.prefix(80))
+    }
+
+    private static func httpsRepo(_ raw: String) -> String? {
+        let text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let parts = URLComponents(string: text),
+              parts.scheme?.lowercased() == "https",
+              let host = parts.host, !host.isEmpty,
+              parts.user == nil, parts.password == nil else { return nil }
+        return text
+    }
+}
+
+public func projectSlug(fromRepo repo: String) -> String? {
+    let raw = repo.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard let parts = URLComponents(string: raw),
+          let scheme = parts.scheme?.lowercased(), scheme == "https" || scheme == "http",
+          let host = parts.host, !host.isEmpty,
+          parts.user == nil, parts.password == nil else { return nil }
+    let segs = parts.path.split(separator: "/").map(String.init)
+    guard segs.count >= 2 else { return nil }
+    var last = segs[segs.count - 1]
+    if last.lowercased().hasSuffix(".git") { last.removeLast(4) }
+    var slug = ""
+    var dash = false
+    for scalar in last.lowercased().unicodeScalars {
+        let ok = (scalar.value >= 97 && scalar.value <= 122) || (scalar.value >= 48 && scalar.value <= 57)
+        if ok {
+            slug.unicodeScalars.append(scalar)
+            dash = false
+        } else if !dash && !slug.isEmpty {
+            slug.append("-")
+            dash = true
+        }
+    }
+    while slug.hasSuffix("-") { slug.removeLast() }
+    guard !slug.isEmpty else { return nil }
+    if slug.count > 80 { return String(slug.prefix(80)) }
+    return slug
 }
 
 public func commandBody(_ command: OutboundCommand) throws -> Data {

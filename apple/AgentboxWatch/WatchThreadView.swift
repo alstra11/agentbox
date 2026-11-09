@@ -13,6 +13,9 @@ struct WatchThreadView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8) {
+                if let badge = executionBadge(target: listItem?.target ?? snapshot?.target, provider: listItem?.provider ?? snapshot?.provider) {
+                    Text(badge).font(.caption2)
+                }
                 Text(question).font(.headline)
                 ForEach(options, id: \.n) { option in
                     Button { Task { await pick(option) } } label: {

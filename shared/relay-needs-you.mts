@@ -78,7 +78,10 @@ export function needsYouFromSnapshot(
   };
 }
 
+/** A heartbeat is about every 30s. Three missed beats and the Mac counts as off. */
+export const MAC_ONLINE_MS = 90_000;
+
 export function macOnlineAt(lastSeen: number | null, now: number): boolean {
   if (!lastSeen) return false;
-  return now - lastSeen < 120_000;
+  return now - lastSeen < MAC_ONLINE_MS;
 }

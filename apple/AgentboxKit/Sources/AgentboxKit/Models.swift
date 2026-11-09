@@ -31,6 +31,8 @@ public struct NeedsYouItem: Codable, Equatable, Sendable {
     public var options: [ReplyOption]
     public var hasApproval: Bool?
     public var wait: WaitState?
+    public var target: String?
+    public var provider: String?
 }
 
 public struct NeedsYouList: Codable, Equatable, Sendable {
@@ -50,6 +52,61 @@ public struct ClientStatus: Codable, Equatable, Sendable {
     public var queue: StatusQueue
     public var version: String?
     public var computerName: String?
+    public var harnesses: [LocalHarness]?
+}
+
+public struct LocalHarness: Codable, Equatable, Sendable {
+    public var id: String
+    public var label: String
+    public var available: Bool
+
+    public init(id: String, label: String, available: Bool) {
+        self.id = id
+        self.label = label
+        self.available = available
+    }
+}
+
+public struct ExecutionTarget: Codable, Equatable, Sendable {
+    public var target: String
+    public var provider: String
+    public var label: String
+    public var available: Bool
+}
+
+public struct ClientTargets: Codable, Equatable, Sendable {
+    public var macOnline: Bool
+    public var computerName: String?
+    public var defaultTarget: String
+    public var harnesses: [LocalHarness]
+    public var targets: [ExecutionTarget]
+}
+
+public func executionBadge(target: String?, provider: String?) -> String? {
+    switch target {
+    case "cloud":
+        guard let name = cloudProviderName(provider) else { return "Cloud" }
+        return "Cloud · \(name)"
+    case "local":
+        return "Lokal · \(localMachineName(provider))"
+    default:
+        return nil
+    }
+}
+
+private func cloudProviderName(_ provider: String?) -> String? {
+    switch provider {
+    case "cursor": return "Cursor"
+    case "openai-agents", "codex-cli": return "Codex"
+    case "claude-managed": return "Claude"
+    case nil, "": return nil
+    default: return provider
+    }
+}
+
+private func localMachineName(_ provider: String?) -> String {
+    if provider == nil || provider == "" || provider == "mac" { return "Mac" }
+    return provider!
 }
 
 public struct ProjectRow: Codable, Equatable, Sendable {
@@ -157,9 +214,11 @@ public struct ThreadSnapshot: Decodable, Equatable, Sendable {
     public var live: LiveRun?
     public var approvals: [ApprovalCard]?
     public var wait: WaitState?
+    public var target: String?
+    public var provider: String?
 
     enum CodingKeys: String, CodingKey {
-        case v, item, history, olderLines, live, approvals, wait
+        case v, item, history, olderLines, live, approvals, wait, target, provider
     }
 
     public init(from decoder: Decoder) throws {
@@ -171,6 +230,8 @@ public struct ThreadSnapshot: Decodable, Equatable, Sendable {
         live = try c.decodeIfPresent(LiveRun.self, forKey: .live)
         approvals = try c.decodeIfPresent([ApprovalCard].self, forKey: .approvals)
         wait = try c.decodeIfPresent(WaitState.self, forKey: .wait)
+        target = try c.decodeIfPresent(String.self, forKey: .target)
+        provider = try c.decodeIfPresent(String.self, forKey: .provider)
     }
 }
 
