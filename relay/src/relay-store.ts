@@ -84,8 +84,9 @@ export class RelayStore {
   }
 
   waitingCommands(device: string): PhoneCommandRow[] {
+    void device;
     return this.data.commands
-      .filter((c) => c.device === device && !c.takenAt)
+      .filter((c) => !c.takenAt)
       .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   }
 

@@ -27,4 +27,20 @@ describe('relayBackend', () => {
     expect(headers.get('authorization')).toBe('Bearer mac-tok');
     expect(headers.get('x-agentbox-device')).toBe('abcabcabcabc');
   });
+
+  it('keeps a command the phone posted under a different device id', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      commands: [{ id: 'c1', kind: 'reply', project: 'alpha', item: 'w-1', payload: { text: 'Ship it' }, source: 'iphone', device: '111111111111', createdAt: '2026-01-01T00:00:00.000Z' }],
+    }), { status: 200 }));
+    const backend = relayBackend({
+      baseUrl: 'https://agents.alstra11.workers.dev',
+      macToken: 'mac-tok',
+      device: 'abcdefabcdef',
+      owner: 'owner-1',
+      fetch: fetchMock,
+    });
+    const rows = await backend.waitingPhoneCommands!('abcdefabcdef');
+    expect(rows.map((c) => c.id)).toEqual(['c1']);
+    expect(rows[0].source).toBe('iphone');
+  });
 });

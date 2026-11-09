@@ -68,6 +68,42 @@ describe('the relay command queue', () => {
     expect((await claim.json() as { claim: string }).claim).toBe('claimed');
   });
 
+  it('lists a reply the phone posted under its own device id', async () => {
+    const store = new RelayStore();
+    store.putProject('macdevice0001', 'alpha', 'Alpha');
+    store.putThreads('macdevice0001', 'alpha', [{
+      item: 'w-abc1234567',
+      snapshot: { item: { id: 'w-abc1234567', title: 'Ship?', status: 'blocked', kind: 'question', updatedAt: 1 } },
+    }]);
+    const posted = await handleRelay(
+      new Request('https://x/client/commands', {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${env.IPHONE_TOKEN}`,
+          'content-type': 'application/json',
+          'x-agentbox-device': '111111111111',
+        },
+        body: JSON.stringify({ kind: 'reply', project: 'alpha', item: 'w-abc1234567', payload: { text: 'Ship it' } }),
+      }),
+      store,
+      env,
+      '111111111111',
+    );
+    expect(posted.status).toBe(200);
+    const listed = await handleRelay(
+      new Request('https://x/mac/commands', {
+        headers: { authorization: `Bearer ${env.MAC_TOKEN}`, 'x-agentbox-device': 'abcdefabcdef' },
+      }),
+      store,
+      env,
+      'abcdefabcdef',
+    );
+    const list = await listed.json() as { commands: { source: string; device: string }[] };
+    expect(list.commands).toHaveLength(1);
+    expect(list.commands[0].source).toBe('iphone');
+    expect(list.commands[0].device).toBe('111111111111');
+  });
+
   it('sends ntfy once per new needs-you stamp', async () => {
     const fetchMock = vi.fn(async () => new Response('ok', { status: 200 }));
     const store = new RelayStore();
