@@ -1,0 +1,15 @@
+name = "agents"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+workers_dev = true
+
+[[durable_objects.bindings]]
+name = "RELAY_ROOM"
+class_name = "RelayRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RelayRoom"]
+
+[vars]
+# Override with `wrangler secret put MAC_TOKEN` and CLIENT_TOKEN.

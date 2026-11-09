@@ -1,0 +1,17 @@
+{
+  "name": "agentbox-relay",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.19",
+    "@cloudflare/workers-types": "^4.20250317.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5",
+    "wrangler": "^4.0.0"
+  }
+}

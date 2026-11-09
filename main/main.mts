@@ -46,7 +46,9 @@ import { carryHerBriefsAcross, joinMessageRules, setAsideShippedMessageRules, un
 import * as approvals from './approvals.mts';
 import { recoveryToast } from '../shared/recovery.mts';
 import { CHORD_ANSWERS, chordLands } from '../shared/card-settles.mts';
-import { phoneWaitsOf } from '../shared/phone-snapshot.mts';
+import { phoneWaitsOf, SNAPSHOT_LIMITS } from '../shared/phone-snapshot.mts';
+import { startRelayService } from './relay/relay-service.mts';
+import os from 'node:os';
 import { teammatesOn } from '../shared/teammates.mts';
 import { dataFolderName, isNewUserBuild } from '../shared/side-build.mts';
 import { runningAsAFreshUser } from '../shared/fresh-user-home.mts';
@@ -945,6 +947,24 @@ async function createWindow() {
     const listed = (await Promise.resolve(phoneChannels.get('zero:file-links')?.({ sender: null }, {})).catch(() => null)) as { ok?: boolean; links?: unknown[] } | null | undefined;
     return { ...model, cloud: supervisor.cloudStatus(), usage: ipc.usageForPhone(), links: listed?.ok ? listed.links : [] };
   };
+  const relay = startRelayService({
+    config,
+    appDir,
+    storeRoot: config.storeRoot,
+    products: () => store.listProducts(),
+    listItems: (slug) => workItemsDisk.readWorkItems(store.productDir(slug)),
+    historyOf: (slug, id, { all = false } = {}) => store.readHistory(slug, id, { max: all ? Number.MAX_SAFE_INTEGER : SNAPSHOT_LIMITS.lines * 4 }),
+    apply: (cmd) => phoneApply!(cmd as import('./phone-inbox.mts').PhoneCommand),
+    readSettings: phoneSettings as import('./relay/relay-service.mts').RelayServiceHooks['readSettings'],
+    liveOf: (slug, id) => supervisor.liveFor(slug, id),
+    waitsOf: () => phoneWaitsOf(supervisor.status()),
+    approvalsOf: () => approvals.listPending(config.storeRoot).map((r) => ({ ...r, card: approvals.cardShown(config.storeRoot, r.id) })),
+    pinsOf: () => supervisor.threadPins,
+    onMacOf: () => supervisor.threadOnMac,
+    version: app.getVersion(),
+    hostname: os.hostname().replace(/\.local$/i, ''),
+  });
+  quitStep(app, 'before-quit', 'relay.stop', () => relay.stop());
   updater.start();
   // A task the app just shipped moved main: look now rather than in half an
   // hour, so the restart is offered while she still remembers the task.
@@ -1134,7 +1154,10 @@ async function createWindow() {
   let cornerTag: ReturnType<typeof createCornerTag> | null = null;
   const notifier = installNotifier({
     app, window, Notification, powerMonitor, ipcMain, nativeImage,
-    onArrivals: (list, needsYou) => team?.phoneArrivals(list, needsYou),
+    onArrivals: (list, needsYou) => {
+      team?.phoneArrivals(list, needsYou);
+      relay.arrivals?.(list, needsYou);
+    },
     onChange: () => cornerTag?.refresh(),
   });
   // THE CORNER TAG (w-dafae58a23): what is ready for her, floating over
